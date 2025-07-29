@@ -1,5 +1,5 @@
 import { apiClient } from './axios';
-import { CreateShippingInfoDto, UpdateShippingInfoDto } from '../interfaces/shippingInfo';
+import { CreateShippingInfoDto, UpdateShippingInfoDto } from '../interfaces/shippingInfo.interface';
 
 export const fetchShippingInfos = async () => {
   try {

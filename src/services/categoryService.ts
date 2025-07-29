@@ -1,5 +1,5 @@
 import { apiClient } from './axios';
-import { CreateCategoryDto, UpdateCategoryDto } from '../interfaces/category';
+import { CreateCategoryDto, UpdateCategoryDto } from '../interfaces/category.interface';
 
 export const fetchCategories = async () => {
   try {

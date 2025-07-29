@@ -1,15 +1,44 @@
-// src/pages/Login.tsx
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useAppDispatch, useAppSelector } from "../redux/hooks";
+import { login } from "../redux/slices/auth.slice";
 
 export default function Login() {
+  const navigate = useNavigate();
+  const dispatch = useAppDispatch();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleLogin = (e: React.FormEvent) => {
-    e.preventDefault();
-    // handle login logic
-  };
+  const { loading, error } = useAppSelector((state) => state.auth);
+
+  const handleLogin = async (e: React.FormEvent) => {
+  e.preventDefault();
+
+  try {
+    const loginData = {
+      email,
+      password,
+    };
+
+    const resultAction = await dispatch(login(loginData));
+
+    if (login.fulfilled.match(resultAction)) {
+      const user = resultAction.payload;
+      console.log("Login successful:", user); 
+
+      navigate("/");
+      setEmail("");
+      setPassword("");
+    } else {
+      console.error("Login failed:", resultAction.payload);
+    }
+
+  } catch (error) {
+    console.error("Something went wrong:", error);
+  }
+};
+
 
   return (
     <div className="max-w-md mx-auto p-6 bg-white shadow rounded-lg mt-10">
@@ -40,11 +69,17 @@ export default function Login() {
         <div className="text-right">
           <Link to="/forgot-password" className="text-blue-600 text-sm">Forgot Password?</Link>
         </div>
+
+        {error && (
+          <div className="text-red-600 text-sm font-medium">{error}</div>
+        )}
+
         <button
           type="submit"
+          disabled={loading}
           className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg"
         >
-          Login
+          {loading ? "Logging In..." : "Login"}
         </button>
       </form>
       <p className="mt-4 text-center text-sm">

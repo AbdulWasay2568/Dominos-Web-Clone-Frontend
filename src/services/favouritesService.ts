@@ -1,8 +1,7 @@
 import { apiClient } from './axios';
 import {
   CreateFavouriteDto,
-  UpdateFavouriteDto,
-} from '../interfaces/favourite';
+} from '../interfaces/favourites.interface';
 
 export const fetchFavourites = async () => {
   try {
@@ -30,16 +29,6 @@ export const createFavourite = async (data: CreateFavouriteDto) => {
     return res.data;
   } catch (err) {
     console.error('Failed to create favourite:', err);
-    throw err;
-  }
-};
-
-export const updateFavourite = async (id: number, data: UpdateFavouriteDto) => {
-  try {
-    const res = await apiClient.put(`/favourites/${id}`, data);
-    return res.data;
-  } catch (err) {
-    console.error(`Failed to update favourite ${id}:`, err);
     throw err;
   }
 };

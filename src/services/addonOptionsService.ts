@@ -2,7 +2,7 @@ import { apiClient } from './axios';
 import {
   CreateAddonOptionDto,
   UpdateAddonOptionDto,
-} from '../interfaces/addonOption';
+} from '../interfaces/addonOptions.interface';
 
 export const fetchAddonOptions = async () => {
   try {
@@ -14,7 +14,7 @@ export const fetchAddonOptions = async () => {
   }
 };
 
-export const fetchAddonOptionById = async (id: string) => {
+export const fetchAddonOptionById = async (id: number) => {
   try {
     const res = await apiClient.get(`/addon-options/${id}`);
     return res.data;
@@ -35,7 +35,7 @@ export const createAddonOption = async (data: CreateAddonOptionDto) => {
 };
 
 export const updateAddonOption = async (
-  id: string,
+  id: number,
   data: UpdateAddonOptionDto
 ) => {
   try {
@@ -47,7 +47,7 @@ export const updateAddonOption = async (
   }
 };
 
-export const deleteAddonOption = async (id: string) => {
+export const deleteAddonOption = async (id: number) => {
   try {
     const res = await apiClient.delete(`/addon-options/${id}`);
     return res.data;

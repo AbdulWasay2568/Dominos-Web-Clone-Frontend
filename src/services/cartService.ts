@@ -1,5 +1,5 @@
 import { apiClient } from './axios';
-import { CreateCartDto, UpdateCartDto } from '../interfaces/cart';
+import { CreateCartDto, UpdateCartDto, AddItemToCartDto } from '../interfaces/cart.interface';
 
 export const fetchCarts = async () => {
   try {
@@ -11,12 +11,12 @@ export const fetchCarts = async () => {
   }
 };
 
-export const fetchCartById = async (id: number) => {
+export const fetchCartByUserId = async (userId: number) => {
   try {
-    const res = await apiClient.get(`/carts/${id}`);
+    const res = await apiClient.get(`/carts/${userId}`);
     return res.data;
   } catch (err) {
-    console.error(`Failed to fetch cart ${id}:`, err);
+    console.error(`Failed to fetch cart ${userId}:`, err);
     throw err;
   }
 };
@@ -47,6 +47,16 @@ export const deleteCart = async (id: number) => {
     return res.data;
   } catch (err) {
     console.error(`Failed to delete cart ${id}:`, err);
+    throw err;
+  }
+};
+
+export const addItemToCart  = async (data: AddItemToCartDto) => {
+  try {
+    const res = await apiClient.post('/carts/cartItems', data);
+    return res.data;
+  } catch (err) {
+    console.error('Failed to add items to cart:', err);
     throw err;
   }
 };

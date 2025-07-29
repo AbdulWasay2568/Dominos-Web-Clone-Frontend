@@ -1,5 +1,5 @@
 import { apiClient } from './axios';
-import { CreateAddonDto, UpdateAddonDto } from '../interfaces/addon';
+import { CreateAddonDto, UpdateAddonDto } from '../interfaces/addons.interface';
 
 export const fetchAddons = async () => {
   try {
@@ -11,7 +11,7 @@ export const fetchAddons = async () => {
   }
 };
 
-export const fetchAddonById = async (id: string) => {
+export const fetchAddonById = async (id: number) => {
   try {
     const res = await apiClient.get(`/addons/${id}`);
     return res.data;
@@ -31,7 +31,7 @@ export const createAddon = async (data: CreateAddonDto) => {
   }
 };
 
-export const updateAddon = async (id: string, data: UpdateAddonDto) => {
+export const updateAddon = async (id: number, data: UpdateAddonDto) => {
   try {
     const res = await apiClient.put(`/addons/${id}`, data);
     return res.data;
@@ -41,7 +41,7 @@ export const updateAddon = async (id: string, data: UpdateAddonDto) => {
   }
 };
 
-export const deleteAddon = async (id: string) => {
+export const deleteAddon = async (id: number) => {
   try {
     const res = await apiClient.delete(`/addons/${id}`);
     return res.data;

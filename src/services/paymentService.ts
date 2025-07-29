@@ -1,5 +1,5 @@
 import { apiClient } from './axios';
-import { CreatePaymentDto, UpdatePaymentDto } from '../interfaces/payment';
+import { CreatePaymentDto, UpdatePaymentDto } from '../interfaces/payment.interface';
 
 export const fetchPayments = async () => {
   try {

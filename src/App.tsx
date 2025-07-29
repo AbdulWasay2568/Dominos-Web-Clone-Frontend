@@ -1,18 +1,18 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Menu from "./screens/Menu";
-import ProductDetails from "./screens/ProductDetails";
-import Cart from "./screens/Cart";
-import Checkout from "./screens/Checkout";
-import OrderConfirmation from "./screens/OrderConfirmation";
-import OrderTracking from "./screens/OrderTracking";
-import OrderHistory from "./screens/OrderHistory";
-import CustomerProfile from "./screens/CustomerProfile";
-import Favorites from "./screens/Favourites";
-import Login from "./screens/Login";
-import SignUp from "./screens/SignUp";
-import ForgotPassword from "./screens/ForgotPassword";
-import CustomerSupport from "./screens/CustomerSupport";
+import Menu from "./pages/Menu";
+import ProductDetails from "./pages/ProductDetails";
+import Cart from "./pages/Cart";
+import Checkout from "./pages/Checkout";
+import OrderConfirmation from "./pages/OrderConfirmation";
+import OrderTracking from "./pages/OrderTracking";
+import OrderHistory from "./pages/OrderHistory";
+import CustomerProfile from "./pages/CustomerProfile";
+import Favorites from "./pages/Favourites";
+import Login from "./pages/Login";
+import SignUp from "./pages/SignUp";
+import ForgotPassword from "./pages/ForgotPassword";
+import CustomerSupport from "./pages/CustomerSupport";
 
 const App: React.FC = () => {
   return (

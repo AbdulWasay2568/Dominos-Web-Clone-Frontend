@@ -1,5 +1,5 @@
 import { apiClient } from './axios';
-import { CreateCartItemDto, UpdateCartItemDto } from '../interfaces/cartItem';
+import { CreateCartItemDto, UpdateCartItemDto } from '../interfaces/cartItem.interface';
 
 export const fetchCartItems = async () => {
   try {

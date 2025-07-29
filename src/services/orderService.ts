@@ -1,5 +1,5 @@
 import { apiClient } from './axios';
-import { CreateOrderDto, UpdateOrderDto } from '../interfaces/order';
+import { CreateOrderDto, UpdateOrderDto } from '../interfaces/order.interfaces';
 
 export const fetchOrders = async () => {
   try {

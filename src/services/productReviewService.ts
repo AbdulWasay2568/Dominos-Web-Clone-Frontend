@@ -2,7 +2,7 @@ import { apiClient } from './axios';
 import {
   CreateProductReviewDto,
   UpdateProductReviewDto,
-} from '../interfaces/productReview';
+} from '../interfaces/productReview.interface';
 
 export const fetchProductReviews = async () => {
   try {

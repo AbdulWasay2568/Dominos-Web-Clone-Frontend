@@ -1,71 +1,22 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FaShoppingCart, FaUserCircle } from "react-icons/fa";
+import { useAppDispatch, useAppSelector } from "../redux/hooks";
+import { getAllCategories } from "../redux/slices/category.slice";
 
-interface SubCategory {
-  name: string;
-  href: string;
+interface NavbarProps {
+  onCategoryClick: (categoryName: string) => void;
 }
 
-interface Category {
-  name: string;
-  subCategories?: SubCategory[];
-}
+const Navbar: React.FC<NavbarProps> = ({ onCategoryClick }) => {
+  const [activeCategory, setActiveCategory] = useState<string | null>("Pizzas");
 
-const categories: Category[] = [
-  {
-    name: "Deals",
-    subCategories: [
-      { name: "WACKY WEDNESDAY", href: "#" },
-      { name: "MORE VALUE DEALS", href: "#" },
-      { name: "GATHERING DEALS", href: "#" },
-      { name: "DAILY DEALS", href: "#" },
-    ],
-  },
-  {
-    name: "Pizzas",
-    subCategories: [
-      { name: "CLASSIC FLAVORS", href: "#" },
-      { name: "FAVORITE FLAVORS", href: "#" },
-      { name: "PREMIUM FLAVORS", href: "#" },
-      { name: "SUPER LOADED PIZZAS", href: "#" },
-      { name: "HALF N HALF", href: "#" },
-    ],
-  },
-  {
-    name: "Pizza Rolls",
-    subCategories: [{ name: "LOADED PIZZA ROLLS", href: "#" }],
-  },
-  {
-    name: "Sides",
-    subCategories: [
-      { name: "CHICKEN CORNER", href: "#" },
-      { name: "FRIES", href: "#" },
-      { name: "BREADS", href: "#" },
-      { name: "DIPS", href: "#" },
-    ],
-  },
-  {
-    name: "Meltz",
-    subCategories: [
-      { name: "MELTZ FAVORITE", href: "#" },
-      { name: "MELTZ PREMIUM", href: "#" },
-    ],
-  },
-  {
-    name: "Desserts",
-    subCategories: [{ name: "DESSERTS", href: "#" }],
-  },
-  {
-    name: "Drinks",
-    subCategories: [{ name: "DRINKS", href: "#" }],
-  },
-];
+  const dispatch = useAppDispatch();
+  const categories = useAppSelector((state) => state.category.categories);
 
-const Navbar: React.FC = () => {
-  const [activeCategory, setActiveCategory] = useState<string | null>("Deals");
-  const [activeSubCategory, setActiveSubCategory] = useState<string | null>(null);
-
-  const currentCategory = categories.find(cat => cat.name === activeCategory);
+  // Fetch categories on mount
+  useEffect(() => {
+    dispatch(getAllCategories());
+  }, [dispatch]);
 
   return (
     <nav className="bg-white border-b shadow-sm text-sm">
@@ -104,15 +55,15 @@ const Navbar: React.FC = () => {
       </div>
 
       {/* Category Row */}
-      <div className="bg-gray-800  text-white px-6 py-2 relative">
-        <div className="flex justify-center items-center gap-6 font-semibold items-center">
+      <div className="bg-gray-800 text-white px-6 py-2 relative">
+        <div className="flex justify-center gap-6 font-semibold">
           {categories.map((category) => (
             <div
               key={category.name}
               onClick={() => {
                 setActiveCategory(category.name);
-                setActiveSubCategory(null);
-              }} 
+                onCategoryClick(category.name);
+              }}
               className="relative cursor-pointer"
             >
               <span
@@ -125,25 +76,6 @@ const Navbar: React.FC = () => {
             </div>
           ))}
         </div>
-
-        {/* Subcategories Row */}
-        {currentCategory?.subCategories?.length && (
-          <div className="flex justify-center items-center  gap-4 font-normal text-sm mt-2">
-            {currentCategory.subCategories.map((sub) => (
-              <span
-                key={sub.name}
-                onClick={() => setActiveSubCategory(sub.name)}
-                className={`cursor-pointer px-2 py-1 rounded ${
-                  activeSubCategory === sub.name
-                    ? "bg-red-600 text-white"
-                    : "hover:underline"
-                }`}
-              >
-                {sub.name}
-              </span>
-            ))}
-          </div>
-        )}
       </div>
     </nav>
   );

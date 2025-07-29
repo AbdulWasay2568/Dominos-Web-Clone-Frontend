@@ -1,49 +1,39 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaTrash, FaPlus, FaMinus } from "react-icons/fa";
-import SuaceBoss from "../assets/Images/SauceBoss.jpg";
-
-interface AddOn {
-  id: number;
-  name: string;
-  price: number;
-}
-
-interface CartItem {
-  id: number;
-  name: string;
-  price: number;
-  imageUrl: string;
-  quantity: number;
-  addOns: AddOn[];
-}
-
-const initialCart: CartItem[] = [
-  {
-    id: 1,
-    name: "Super Loaded Pizza",
-    price: 999,
-    imageUrl: SuaceBoss,
-    quantity: 1,
-    addOns: [
-      { id: 1, name: "Extra Cheese", price: 100 },
-      { id: 3, name: "Pepperoni", price: 70 },
-    ],
-  },
-  {
-    id: 2,
-    name: "Spicy Jalapeno Pizza",
-    price: 899,
-    imageUrl: SuaceBoss,
-    quantity: 2,
-    addOns: [{ id: 5, name: "None", price: 0 }],
-  },
-];
+import { useAppDispatch, useAppSelector } from "../redux/hooks";
+import { getCartByUserId } from "../redux/slices/cart.slice";
+import { CartItem } from "../interfaces/cartItem.interface";
+import SauceBoss from "../assets/Images/SauceBoss.jpg";
 
 const CartScreen: React.FC = () => {
   const navigate = useNavigate();
-  const [cart, setCart] = useState<CartItem[]>(initialCart);
+  const dispatch = useAppDispatch();
+
+  const user = useAppSelector((state) => state.auth.user);
+  const currentCart = useAppSelector((state) => state.cart.currentCart);
+  const [cart, setCart] = useState<CartItem[]>([]);
   const [instructions, setInstructions] = useState("");
+
+  useEffect(() => {
+    if (user?.id) {
+      dispatch(getCartByUserId(user.id));
+    }
+  }, [dispatch, user?.id]);
+
+  useEffect(() => {
+    if (currentCart?.cartItems) {
+      // Optionally enrich with image or fallback
+      const updated = currentCart.cartItems.map((item) => ({
+        ...item,
+        name: item.product.name,
+        price: item.product.price,
+        imageUrl: SauceBoss,
+        addonOptions: item.addonOptions ?? [],
+      }));
+      setCart(updated);
+    }
+  }, [currentCart]);
 
   const handleIncrease = (id: number) => {
     setCart((prev) =>
@@ -70,7 +60,7 @@ const CartScreen: React.FC = () => {
   };
 
   const getItemTotal = (item: CartItem) => {
-    const addOnTotal = item.addOns.reduce((sum, a) => sum + a.price, 0);
+    const addOnTotal = item.addonOptions?.reduce((sum, a) => sum + a.additionalPrice, 0) || 0;
     return (item.price + addOnTotal) * item.quantity;
   };
 
@@ -81,8 +71,8 @@ const CartScreen: React.FC = () => {
   const grandTotal = total + deliveryCharge + posFee - discount;
 
   const handleCheckout = () => {
-    navigate('/checkout');
-  }
+    navigate("/checkout");
+  };
 
   return (
     <div className="max-w-7xl mx-auto p-6">
@@ -92,7 +82,7 @@ const CartScreen: React.FC = () => {
         <p className="text-center text-gray-500 text-lg">Your cart is empty.</p>
       ) : (
         <div className="flex flex-col lg:flex-row gap-8">
-          {/* Cart Items Section */}
+          {/* Cart Items */}
           <div className="flex-1 space-y-6">
             {cart.map((item) => (
               <div
@@ -106,23 +96,13 @@ const CartScreen: React.FC = () => {
                 />
 
                 <div className="flex-1">
-                  <div className="flex justify-between items-center">
                     <h2 className="text-xl font-semibold">{item.name}</h2>
-                    <span className="text-lg font-bold text-blue-600">
-                      Rs. {getItemTotal(item)}
-                    </span>
-                  </div>
-
-                  <p className="text-sm text-gray-600 mt-1">
-                    Base Price: Rs. {item.price}
-                  </p>
 
                   <div className="mt-2">
-                    <h3 className="font-medium text-sm mb-1">Add-ons:</h3>
                     <ul className="list-disc list-inside text-sm text-gray-700">
-                      {item.addOns.map((a) => (
+                      {item.addonOptions?.map((a) => (
                         <li key={a.id}>
-                          {a.name} {a.price > 0 && `(+Rs. ${a.price})`}
+                          {a.optionName} {a.additionalPrice > 0 && `(+Rs. ${a.additionalPrice})`}
                         </li>
                       ))}
                     </ul>
@@ -162,14 +142,12 @@ const CartScreen: React.FC = () => {
             ))}
           </div>
 
-          {/* Checkout Summary Section */}
+          {/* Checkout Section */}
           <div className="w-full lg:w-1/3 bg-gray-50 p-5 rounded-lg shadow space-y-4 h-fit">
             <h2 className="text-xl font-bold">Checkout</h2>
 
             <div>
-              <label className="block font-medium mb-1">
-                Delivery Instructions
-              </label>
+              <label className="block font-medium mb-1">Delivery Instructions</label>
               <textarea
                 rows={3}
                 value={instructions}
@@ -203,8 +181,10 @@ const CartScreen: React.FC = () => {
               </div>
             </div>
 
-            <button className="w-full bg-green-600 text-white py-2 rounded hover:bg-green-700 transition"
-              onClick={handleCheckout}>
+            <button
+              className="w-full bg-green-600 text-white py-2 rounded hover:bg-green-700 transition"
+              onClick={handleCheckout}
+            >
               Proceed to Checkout
             </button>
           </div>

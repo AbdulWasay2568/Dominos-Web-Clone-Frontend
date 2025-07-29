@@ -1,5 +1,5 @@
 import { apiClient } from './axios';
-import { CreateAddressDto, UpdateAddressDto } from '../interfaces/address';
+import { CreateAddressDto, UpdateAddressDto } from '../interfaces/address.interface';
 
 export const fetchAddresses = async () => {
   try {

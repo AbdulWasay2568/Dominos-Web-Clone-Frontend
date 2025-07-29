@@ -1,5 +1,5 @@
 import { apiClient } from './axios';
-import { CreateUserDto, UpdateUserDto } from '../interfaces/user';
+import { CreateUserDto, UpdateUserDto } from '../interfaces/users.interface';
 
 export const fetchUsers = async () => {
   try {
