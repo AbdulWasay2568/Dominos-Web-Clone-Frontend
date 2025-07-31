@@ -11,7 +11,7 @@ interface CardProps {
 
 const Card: React.FC<CardProps> = ({ scrollToCategory }) => {
   const dispatch = useAppDispatch();
-  const { products, loading, error } = useAppSelector((state) => state.product);
+  const { products, error } = useAppSelector((state) => state.product);
   const [hearts, setHearts] = useState<boolean[]>([]);
 
   const sectionRefs = useRef<Record<string, HTMLDivElement | null>>({});
@@ -39,7 +39,6 @@ const Card: React.FC<CardProps> = ({ scrollToCategory }) => {
     setHearts(updated);
   };
 
-  if (loading) return <div className="px-6 py-6">Loading...</div>;
   if (error) return <div className="px-6 py-6 text-red-600">{error}</div>;
 
   const categoryNames = Array.from(

@@ -1,60 +1,35 @@
-import React, { useState } from "react";
-
-interface Order {
-  id: number;
-  date: string;
-  status: string;
-  products: string[];
-  total: number;
-}
-
-const allOrders: Order[] = [
-  {
-    id: 1,
-    date: "2024-07-20",
-    status: "Delivered",
-    products: ["Pepperoni Pizza", "Coke"],
-    total: 899,
-  },
-  {
-    id: 2,
-    date: "2024-07-18",
-    status: "Pending",
-    products: ["Cheese Pizza"],
-    total: 699,
-  },
-  {
-    id: 3,
-    date: "2024-07-15",
-    status: "Cancelled",
-    products: ["BBQ Pizza", "Garlic Bread"],
-    total: 1099,
-  },
-  {
-    id: 4,
-    date: "2024-07-10",
-    status: "Preparing",
-    products: ["Chicken Tikka Pizza"],
-    total: 799,
-  },
-  // Add more orders as needed
-];
+import { useEffect, useState } from "react";
+import { useAppDispatch, useAppSelector } from "../redux/hooks";
+import { getOrdersByUserId } from "../redux/slices/order.slice";
+import { Order } from "../interfaces/order.interfaces";
 
 export default function OrderHistory() {
+  const dispatch = useAppDispatch();
+
   const [currentPage, setCurrentPage] = useState(1);
   const [ordersPerPage] = useState(3);
   const [statusFilter, setStatusFilter] = useState("All");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
 
+  const user = useAppSelector((state) => state.auth.user);
+  const orders = useAppSelector((state) => state.order.orders) as Order[];
+
+  useEffect(() => {
+  if (user && user.id) {
+    dispatch(getOrdersByUserId(Number(user.id)));
+  }
+}, [dispatch, user]);
+
+
   // Filter and sort logic
-  const filteredOrders = allOrders
+  const filteredOrders = orders
     .filter((order) => {
       if (statusFilter === "All") return true;
       return order.status === statusFilter;
     })
     .sort((a, b) => {
-      const dateA = new Date(a.date);
-      const dateB = new Date(b.date);
+      const dateA = new Date(a.createdAt);
+      const dateB = new Date(b.createdAt);
       return sortOrder === "asc"
         ? dateA.getTime() - dateB.getTime()
         : dateB.getTime() - dateA.getTime();
@@ -68,7 +43,8 @@ export default function OrderHistory() {
   );
 
   const handleReorder = (order: Order) => {
-    alert(`Reordering: ${order.products.join(", ")}`);
+    // You can implement reorder logic here
+    console.log("Reordering:", order.id);
   };
 
   return (
@@ -83,10 +59,10 @@ export default function OrderHistory() {
             className="border p-2 rounded"
           >
             <option value="All">All Statuses</option>
-            <option value="Pending">Pending</option>
-            <option value="Preparing">Preparing</option>
-            <option value="Delivered">Delivered</option>
-            <option value="Cancelled">Cancelled</option>
+            <option value="PENDING">Pending</option>
+            <option value="PREPARING">Preparing</option>
+            <option value="DELIVERED">Delivered</option>
+            <option value="CANCELLED">Cancelled</option>
           </select>
 
           <select
@@ -108,15 +84,15 @@ export default function OrderHistory() {
           >
             <div className="flex flex-col space-y-2">
               <p className="text-lg font-semibold">
-                Order #{order.id} • {order.date}
+                Order #{order.id} • {new Date(order.createdAt).toLocaleString()}
               </p>
               <p className="text-gray-600">
                 Status:{" "}
                 <span
                   className={`font-medium ${
-                    order.status === "Delivered"
+                    order.status === "DELIVERED"
                       ? "text-green-600"
-                      : order.status === "Cancelled"
+                      : order.status === "CANCELLED"
                       ? "text-red-600"
                       : "text-yellow-600"
                   }`}
@@ -124,9 +100,13 @@ export default function OrderHistory() {
                   {order.status}
                 </span>
               </p>
-              <p className="text-gray-800">Total: Rs. {order.total}</p>
+              <p className="text-gray-800">Total: Rs. {order.totalAmount}</p>
               <p className="text-gray-700">
-                Products: {order.products.join(", ")}
+                Products:{" "}
+                {order.orderItems
+                  .map((item) => item.product?.name)
+                  .filter(Boolean)
+                  .join(", ")}
               </p>
             </div>
 

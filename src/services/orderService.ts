@@ -20,7 +20,15 @@ export const fetchOrderById = async (id: number) => {
     throw err;
   }
 };
-
+export const fetchOrdersByUserId = async (userId: number) => {
+  try {
+    const res = await apiClient.get(`/orders/user/${userId}`);
+    return res.data;
+  } catch (err) {
+    console.error(`Failed to fetch order ${userId}:`, err);
+    throw err;
+  }
+};
 export const createOrder = async (data: CreateOrderDto) => {
   try {
     const res = await apiClient.post('/orders', data);

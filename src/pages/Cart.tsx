@@ -3,8 +3,10 @@ import { useNavigate } from "react-router-dom";
 import { FaTrash, FaPlus, FaMinus } from "react-icons/fa";
 import { useAppDispatch, useAppSelector } from "../redux/hooks";
 import { getCartByUserId } from "../redux/slices/cart.slice";
+import { editCartItem, removeCartItem } from "../redux/slices/cartItem.slice"
 import { CartItem } from "../interfaces/cartItem.interface";
 import SauceBoss from "../assets/Images/SauceBoss.jpg";
+import { setGrandTotal } from "../redux/slices/order.slice";
 
 const CartScreen: React.FC = () => {
   const navigate = useNavigate();
@@ -12,65 +14,33 @@ const CartScreen: React.FC = () => {
 
   const user = useAppSelector((state) => state.auth.user);
   const currentCart = useAppSelector((state) => state.cart.currentCart);
-  const [cart, setCart] = useState<CartItem[]>([]);
   const [instructions, setInstructions] = useState("");
 
   useEffect(() => {
-    if (user?.id) {
-      dispatch(getCartByUserId(user.id));
+    if (user?.id === null || user === null || user === undefined) {
+      navigate("/login");
+    } else {
+      dispatch(getCartByUserId(Number(user.id)));
     }
-  }, [dispatch, user?.id]);
+  }, [dispatch, user, navigate]);
 
-  useEffect(() => {
-    if (currentCart?.cartItems) {
-      // Optionally enrich with image or fallback
-      const updated = currentCart.cartItems.map((item) => ({
-        ...item,
-        name: item.product.name,
-        price: item.product.price,
-        imageUrl: SauceBoss,
-        addonOptions: item.addonOptions ?? [],
-      }));
-      setCart(updated);
-    }
-  }, [currentCart]);
 
-  const handleIncrease = (id: number) => {
-    setCart((prev) =>
-      prev.map((item) =>
-        item.id === id ? { ...item, quantity: item.quantity + 1 } : item
-      )
-    );
-  };
-
-  const handleDecrease = (id: number) => {
-    setCart((prev) =>
-      prev
-        .map((item) =>
-          item.id === id && item.quantity > 1
-            ? { ...item, quantity: item.quantity - 1 }
-            : item
-        )
-        .filter((item) => item.quantity > 0)
-    );
-  };
-
-  const handleRemove = (id: number) => {
-    setCart((prev) => prev.filter((item) => item.id !== id));
-  };
+  const cartItems = currentCart?.cartItems || [];
 
   const getItemTotal = (item: CartItem) => {
-    const addOnTotal = item.addonOptions?.reduce((sum, a) => sum + a.additionalPrice, 0) || 0;
-    return (item.price + addOnTotal) * item.quantity;
+    const addOnTotal =
+      item.addonOptions?.reduce((sum, a) => sum + a.additionalPrice, 0) || 0;
+    return addOnTotal * item.quantity;
   };
 
-  const total = cart.reduce((sum, item) => sum + getItemTotal(item), 0);
+  const total = cartItems.reduce((sum, item) => sum + getItemTotal(item), 0);
   const deliveryCharge = 129;
   const posFee = 0;
   const discount = 0;
   const grandTotal = total + deliveryCharge + posFee - discount;
 
   const handleCheckout = () => {
+    dispatch(setGrandTotal(grandTotal));
     navigate("/checkout");
   };
 
@@ -78,31 +48,37 @@ const CartScreen: React.FC = () => {
     <div className="max-w-7xl mx-auto p-6">
       <h1 className="text-3xl font-bold mb-6 text-center">🛒 Your Cart</h1>
 
-      {cart.length === 0 ? (
+      {cartItems.length === 0 ? (
         <p className="text-center text-gray-500 text-lg">Your cart is empty.</p>
       ) : (
         <div className="flex flex-col lg:flex-row gap-8">
           {/* Cart Items */}
           <div className="flex-1 space-y-6">
-            {cart.map((item) => (
+            {cartItems.map((item) => (
               <div
                 key={item.id}
                 className="flex gap-4 items-start border rounded-lg p-4 shadow-sm hover:shadow-md transition"
               >
                 <img
-                  src={item.imageUrl}
-                  alt={item.name}
+                  src={SauceBoss}
+                  alt={item.product?.name ?? "Product image"}
                   className="w-28 h-28 rounded object-cover"
                 />
 
                 <div className="flex-1">
-                    <h2 className="text-xl font-semibold">{item.name}</h2>
+                  <div className="flex flex-row justify-between">
+                    <h2 className="text-xl font-semibold">
+                      {item.product?.name ?? <span className="text-red-500">[Product Not Found]</span>}
+                    </h2>
+                    <h2 className="text-xl font-semibold">Rs. {getItemTotal(item)}</h2>
+                  </div>
 
                   <div className="mt-2">
                     <ul className="list-disc list-inside text-sm text-gray-700">
                       {item.addonOptions?.map((a) => (
                         <li key={a.id}>
-                          {a.optionName} {a.additionalPrice > 0 && `(+Rs. ${a.additionalPrice})`}
+                          {a.optionName}{" "}
+                          {a.additionalPrice > 0 && `(+Rs. ${a.additionalPrice})`}
                         </li>
                       ))}
                     </ul>
@@ -112,8 +88,13 @@ const CartScreen: React.FC = () => {
                     <button
                       onClick={() =>
                         item.quantity === 1
-                          ? handleRemove(item.id)
-                          : handleDecrease(item.id)
+                          ? dispatch(removeCartItem(item.id))
+                          : dispatch(
+                              editCartItem({
+                                id: item.id,
+                                data: { quantity: item.quantity - 1 },
+                              })
+                            )
                       }
                       className={`p-2 rounded-full border ${
                         item.quantity === 1
@@ -131,7 +112,14 @@ const CartScreen: React.FC = () => {
                     <span className="text-lg font-semibold">{item.quantity}</span>
 
                     <button
-                      onClick={() => handleIncrease(item.id)}
+                      onClick={() =>
+                        dispatch(
+                          editCartItem({
+                            id: item.id,
+                            data: { quantity: item.quantity + 1 },
+                          })
+                        )
+                      }
                       className="p-2 rounded-full bg-blue-100 hover:bg-blue-200 text-blue-600 transition"
                     >
                       <FaPlus className="w-4 h-4" />

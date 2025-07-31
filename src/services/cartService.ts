@@ -13,7 +13,7 @@ export const fetchCarts = async () => {
 
 export const fetchCartByUserId = async (userId: number) => {
   try {
-    const res = await apiClient.get(`/carts/${userId}`);
+    const res = await apiClient.get(`/carts/user/${userId}`);
     return res.data;
   } catch (err) {
     console.error(`Failed to fetch cart ${userId}:`, err);

@@ -13,12 +13,13 @@ import Login from "./pages/Login";
 import SignUp from "./pages/SignUp";
 import ForgotPassword from "./pages/ForgotPassword";
 import CustomerSupport from "./pages/CustomerSupport";
+import ProfilePage from "./components/Profile";
 
 const App: React.FC = () => {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<Menu />} />
+{/* customer */}
         <Route path="/product/:productName" element={<ProductDetails />} />
         <Route path="/cart" element={<Cart />} />
         <Route path="/checkout" element={<Checkout />} />
@@ -29,11 +30,13 @@ const App: React.FC = () => {
 
         <Route path="/customer-profile" element={<CustomerProfile />} />
         <Route path="/customer-support" element={<CustomerSupport />} />
-
+        <Route path="/profile" element={<ProfilePage />} />
+        
+{/* public */}
+        <Route path="/" element={<Menu />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<SignUp />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
-
 
       </Routes>
     </Router>

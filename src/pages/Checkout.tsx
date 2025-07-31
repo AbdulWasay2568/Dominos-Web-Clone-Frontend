@@ -1,8 +1,16 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAppDispatch, useAppSelector } from "../redux/hooks";
+import { createNewOrder } from "../redux/slices/order.slice";
+import { OrderStatus, PaymentStatus } from "../interfaces/enums.interface"
 
 const CheckoutScreen: React.FC = () => {
-    const navigate = useNavigate();
+  const navigate = useNavigate();
+  const dispatch = useAppDispatch();
+
+  const grandTotal = useAppSelector((state)=> state.order.grandTotal);
+  const cart = useAppSelector((state)=> state.cart.currentCart);
+
   const [houseNo, setHouseNo] = useState("");
   const [street, setStreet] = useState("");
   const [society, setSociety] = useState("");
@@ -18,21 +26,61 @@ const CheckoutScreen: React.FC = () => {
   });
   const [eWalletNumber, setEWalletNumber] = useState("");
 
-  const handleCheckout = () => {
-    const fullAddress = `${houseNo}, ${street}, ${society}, ${city}`;
-    console.log("Address:", fullAddress);
-    console.log("Instructions:", deliveryInstructions);
-    console.log("Payment Method:", paymentMethod);
+  const handleCheckout = async() => {
+    // const fullAddress = `${houseNo}, ${street}, ${society}, ${city}`;
+    // console.log("Address:", fullAddress);
+    // console.log("Instructions:", deliveryInstructions);
+    // console.log("Payment Method:", paymentMethod);
 
-    if (paymentMethod === "card") {
-      console.log("Card Details:", cardDetails);
-    } else if (paymentMethod === "easypaisa") {
-      console.log("Easypaisa/JazzCash:", eWalletNumber);
-    }
+    // if (paymentMethod === "card") {
+    //   console.log("Card Details:", cardDetails);
+    // } else if (paymentMethod === "easypaisa") {
+    //   console.log("Easypaisa/JazzCash:", eWalletNumber);
+    // }
+
+    // console.log(cart)
     
-    navigate("/order-confirmation");
+    if (!cart?.userId || grandTotal == null || !cart.cartItems?.length) {
+      console.error("Missing required order data");
+      return;
+    }
 
-    // Proceed to payment or backend call
+    const orderPayload = {
+      userId: cart?.userId,
+      totalAmount: grandTotal,
+      status: OrderStatus.PENDING,
+      orderItems: cart?.cartItems.map(item => ({
+        productId: item.productId,
+        quantity: item.quantity,
+        addonOptions: item.addonOptions.map(opt => opt.id),
+      })),
+      shippingInfo: {
+        houseNo,
+        street,
+        society,
+        city,
+        zipCode: "54000" // or input field
+      },
+      payment: {
+        method: paymentMethod,
+        amount: grandTotal,
+        status: PaymentStatus.PENDING
+      }
+    };
+
+      try {
+        const response = await dispatch(createNewOrder(orderPayload)).unwrap();
+        navigate("/order-confirmation", {
+          state: {
+            orderId: response.id,
+            address: `${houseNo}, ${street}, ${society}, ${city}`,
+            paymentMethod,
+          },
+        });
+      } catch (error) {
+        console.error("Failed to place order:", error);
+      }
+
   };
 
   return (
@@ -195,7 +243,7 @@ const CheckoutScreen: React.FC = () => {
           <hr className="border-gray-300" />
           <div className="flex justify-between font-semibold text-lg text-gray-900">
             <span>Grand Total</span>
-            <span>Rs. 2427</span>
+            <span>{grandTotal}</span>
           </div>
           <button
             onClick={handleCheckout}

@@ -8,7 +8,7 @@ export interface CreateCartItemDto {
 }
 
 export interface UpdateCartItemDto {
-  quantity?: number;
+  quantity: number;
 }
 
 export interface CartItem {

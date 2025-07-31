@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { FaShoppingCart, FaUserCircle } from "react-icons/fa";
 import { useAppDispatch, useAppSelector } from "../redux/hooks";
 import { getAllCategories } from "../redux/slices/category.slice";
+import { Link } from "react-router-dom";
 
 interface NavbarProps {
   onCategoryClick: (categoryName: string) => void;
@@ -35,21 +36,24 @@ const Navbar: React.FC<NavbarProps> = ({ onCategoryClick }) => {
         </div>
 
         <div className="hidden lg:flex gap-8 font-semibold text-black">
-          <span className="hover:text-blue-700 cursor-pointer">MENU</span>
+          <Link to='/' className="hover:text-blue-700 cursor-pointer">MENU</Link>
           <span className="hover:text-blue-700 cursor-pointer">STORES</span>
           <span className="hover:text-blue-700 cursor-pointer">OUR APPS</span>
         </div>
 
         <div className="flex items-center gap-6">
           <div className="relative">
-            <FaShoppingCart className="text-xl" />
-            <span className="absolute -top-2 -right-2 bg-red-600 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
-              0
-            </span>
+            <Link to='cart'>
+              <FaShoppingCart className="text-xl" />
+              <span className="absolute -top-2 -right-2 bg-red-600 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
+                0
+              </span>
+  
+            </Link>
           </div>
           <div className="flex items-center gap-1">
             <FaUserCircle className="text-xl" />
-            <span className="font-semibold">MY ACCOUNT</span>
+            <Link to="/customer-profile" className="font-semibold">MY ACCOUNT</Link>
           </div>
         </div>
       </div>

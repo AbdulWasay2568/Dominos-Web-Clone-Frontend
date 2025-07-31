@@ -7,6 +7,7 @@ import {
   addItemToCart,
   fetchCartByUserId,
 } from '../../services/cartService';
+import { editCartItem, removeCartItem } from './cartItem.slice'; 
 import { Cart, AddItemToCartDto } from '../../interfaces/cart.interface';
 import { CartItem } from '../../interfaces/cartItem.interface';
 
@@ -75,7 +76,7 @@ const cartSlice = createSlice({
   reducers: {
     clearCurrentCart: (state) => {
       state.currentCart = null;
-    },
+    }
   },
   extraReducers: (builder) => {
     builder
@@ -118,13 +119,18 @@ const cartSlice = createSlice({
       })
       .addCase(addProductWithAddonsToCart.fulfilled, (state, action: PayloadAction<CartItem>) => {
         state.loading = false;
+
         if (state.currentCart) {
-          if (!('items' in state.currentCart)) {
-            (state.currentCart as any).items = [];
+          // Make sure cartItems array exists
+          if (!state.currentCart.cartItems) {
+            state.currentCart.cartItems = [];
           }
-          (state.currentCart as any).items.push(action.payload);
+
+          // Push the new item to cartItems
+          state.currentCart.cartItems.push(action.payload);
         }
       })
+
       .addCase(addProductWithAddonsToCart.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload || 'Something went wrong';
@@ -142,7 +148,29 @@ const cartSlice = createSlice({
       .addCase(getCartByUserId.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
+      })
+
+      //update cart item quantity from cart
+      .addCase(editCartItem.fulfilled, (state, action: PayloadAction<CartItem>) => {
+        if (state.currentCart?.cartItems) {
+          const index = state.currentCart.cartItems.findIndex(
+            (item) => item.id === action.payload.id
+          );
+          if (index !== -1) {
+            state.currentCart.cartItems[index] = action.payload;
+          }
+        }
+      })
+
+      //remove cart item from cart
+      .addCase(removeCartItem.fulfilled, (state, action: PayloadAction<number>) => {
+        if (state.currentCart?.cartItems) {
+          state.currentCart.cartItems = state.currentCart.cartItems.filter(
+            (item) => item.id !== action.payload
+          );
+        }
       });
+
   },
 });
 

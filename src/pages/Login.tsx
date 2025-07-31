@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../redux/hooks";
 import { login } from "../redux/slices/auth.slice";
+import Loader from "../components/Loader";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -38,6 +39,8 @@ export default function Login() {
     console.error("Something went wrong:", error);
   }
 };
+
+if (loading) return <Loader/>;
 
 
   return (
@@ -76,10 +79,9 @@ export default function Login() {
 
         <button
           type="submit"
-          disabled={loading}
           className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg"
         >
-          {loading ? "Logging In..." : "Login"}
+          Login
         </button>
       </form>
       <p className="mt-4 text-center text-sm">

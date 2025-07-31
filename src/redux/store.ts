@@ -5,7 +5,10 @@ categoryReducer,
 productReducer, 
 addonsReducer, 
 addonOptionsReducer,
-cartReducer
+cartReducer,
+cartItemReducer,
+orderReducer,
+orderItemReducer
 } from "./slices"
 
 export const store = configureStore({
@@ -15,7 +18,10 @@ export const store = configureStore({
         product: productReducer,
         addons: addonsReducer,
         addonOptions: addonOptionsReducer,
-        cart: cartReducer
+        cart: cartReducer,
+        cartItem: cartItemReducer,
+        order: orderReducer,
+        orderItem: orderItemReducer
         
     }
 })

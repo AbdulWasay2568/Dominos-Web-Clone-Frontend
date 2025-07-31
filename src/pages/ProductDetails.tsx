@@ -12,7 +12,7 @@ const ProductDetails: React.FC = () => {
   const productId = location.state?.productId;
 
   const dispatch = useAppDispatch();
-  const { product, loading, error } = useAppSelector((state) => state.product);
+  const { product, error } = useAppSelector((state) => state.product);
   const user = useAppSelector((state) => state.auth.user);
 
   const [quantity, setQuantity] = useState<number>(1);
@@ -52,28 +52,32 @@ const toggleExtraOption = (optionId: number) => {
   const totalPrice = ((selectedFirstOption?.additionalPrice || 0) + extraAddOnsTotal) * quantity;
 
   const handleAddToCart = () => {
+    if (!product) return;
 
-      // if (!product || !user) return;
+    if (!user || user.id === null || user === undefined) {
+      navigate("/login");
+      return;
+    }
 
-      // const addonOptionIds = [
-      //   ...(selectedFirstOption ? [selectedFirstOption.id] : []),
-      //   ...selectedExtraOptions,
-      // ];
+    const addonOptionIds = [
+      ...(selectedFirstOption ? [selectedFirstOption.id] : []),
+      ...selectedExtraOptions,
+    ];
 
-      // dispatch(
-      //   addProductWithAddonsToCart({
-      //     userId: user.id,
-      //     productId: product.id,
-      //     quantity,
-      //     addonOptionIds, 
-      //   })
-      // );
+    dispatch(
+      addProductWithAddonsToCart({
+        userId: Number(user.id),
+        productId: product.id,
+        quantity,
+        addonOptionIds,
+      })
+    );
 
-      navigate("/cart")
-    };
+    navigate("/cart");
+  };
 
 
-  // if (loading) return <p className="text-center mt-8">Loading product...</p>;
+
   if (error) return <p className="text-center text-red-600 mt-8">Error: {error}</p>;
   if (!product) return <p className="text-center mt-8">Product not found.</p>;
 

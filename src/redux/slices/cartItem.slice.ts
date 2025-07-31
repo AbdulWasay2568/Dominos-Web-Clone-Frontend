@@ -6,7 +6,7 @@ import {
   updateCartItem,
   deleteCartItem,
 } from '../../services/cartItemService';
-import { CartItem } from '../../interfaces/cartItem.interface';
+import { CartItem, UpdateCartItemDto } from '../../interfaces/cartItem.interface';
 
 interface CartItemState {
   items: CartItem[];
@@ -37,7 +37,7 @@ export const addCartItem = createAsyncThunk('cartItems/create', async (data: Car
 
 export const editCartItem = createAsyncThunk(
   'cartItems/update',
-  async ({ id, data }: { id: number; data: CartItem }) => {
+  async ({ id, data }: { id: number, data: UpdateCartItemDto }) => {
     return await updateCartItem(id, data);
   }
 );
