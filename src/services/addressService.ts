@@ -21,6 +21,16 @@ export const fetchAddressById = async (id: number) => {
   }
 };
 
+export const fetchAddressesByUserId = async (userId: number) => {
+  try {
+    const res = await apiClient.get(`/addresses/user/${userId}`);
+    return res.data;
+  } catch (err) {
+    console.error(`Failed to fetch address ${userId}:`, err);
+    throw err;
+  }
+};
+
 export const createAddress = async (data: CreateAddressDto) => {
   try {
     const res = await apiClient.post('/addresses', data);

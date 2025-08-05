@@ -1,28 +1,50 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { FaShoppingCart, FaUserCircle } from "react-icons/fa";
 import { useAppDispatch, useAppSelector } from "../redux/hooks";
-import { getAllCategories } from "../redux/slices/category.slice";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { logout } from "../redux/slices/auth.slice";
 
-interface NavbarProps {
-  onCategoryClick: (categoryName: string) => void;
-}
-
-const Navbar: React.FC<NavbarProps> = ({ onCategoryClick }) => {
-  const [activeCategory, setActiveCategory] = useState<string | null>("Pizzas");
-
+const Navbar: React.FC = () => {
+  const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const categories = useAppSelector((state) => state.category.categories);
+  const authUser = useAppSelector((state) => state.auth.user);
+  const user = useAppSelector((state) => state.user.currentUser)
+  const [showModal, setShowModal] = useState(false);
+  const modalRef = useRef<HTMLDivElement>(null);
 
-  // Fetch categories on mount
+  const handleLogout = () => {
+    dispatch(logout());
+    setShowModal(false);
+    navigate("/");
+  };
+
+  const handleAccountClick = () => {
+    if(!authUser){
+      navigate("/login");
+    }
+    setShowModal((prev) => !prev);
+  };
+
+  const handleMyAccount = () => {
+    setShowModal(false);
+    navigate("/profile");
+  };
+
+  // Close modal on outside click
   useEffect(() => {
-    dispatch(getAllCategories());
-  }, [dispatch]);
+    const handleClickOutside = (event: MouseEvent) => {
+      if (modalRef.current && !modalRef.current.contains(event.target as Node)) {
+        setShowModal(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   return (
-    <nav className="bg-white border-b shadow-sm text-sm">
-      {/* Top Row */}
+    <nav className="bg-white border-b shadow-sm text-sm relative">
       <div className="flex justify-between items-center px-6 py-2">
+        {/* Logo & Location */}
         <div className="flex items-center gap-6">
           <img
             src="https://upload.wikimedia.org/wikipedia/commons/7/74/Dominos_pizza_logo.svg"
@@ -35,50 +57,54 @@ const Navbar: React.FC<NavbarProps> = ({ onCategoryClick }) => {
           </span>
         </div>
 
+        {/* Nav Links */}
         <div className="hidden lg:flex gap-8 font-semibold text-black">
-          <Link to='/' className="hover:text-blue-700 cursor-pointer">MENU</Link>
+          <Link to="/" className="hover:text-blue-700 cursor-pointer">MENU</Link>
           <span className="hover:text-blue-700 cursor-pointer">STORES</span>
           <span className="hover:text-blue-700 cursor-pointer">OUR APPS</span>
         </div>
 
-        <div className="flex items-center gap-6">
+        {/* Cart & Account */}
+        <div className="flex items-center gap-6 relative">
           <div className="relative">
-            <Link to='cart'>
+            <Link to="/cart">
               <FaShoppingCart className="text-xl" />
               <span className="absolute -top-2 -right-2 bg-red-600 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
                 0
               </span>
-  
             </Link>
           </div>
-          <div className="flex items-center gap-1">
-            <FaUserCircle className="text-xl" />
-            <Link to="/customer-profile" className="font-semibold">MY ACCOUNT</Link>
-          </div>
-        </div>
-      </div>
 
-      {/* Category Row */}
-      <div className="bg-gray-800 text-white px-6 py-2 relative">
-        <div className="flex justify-center gap-6 font-semibold">
-          {categories.map((category) => (
+          <div className="flex items-center gap-1 cursor-pointer" onClick={handleAccountClick}>
+            <FaUserCircle className="text-xl" />
+            <span className="font-semibold">{user?.name ?? 'My Account'}</span>
+          </div>
+
+          {/* Modal Dropdown */}
+          {showModal && (
             <div
-              key={category.name}
-              onClick={() => {
-                setActiveCategory(category.name);
-                onCategoryClick(category.name);
-              }}
-              className="relative cursor-pointer"
+              ref={modalRef}
+              className="absolute top-12 right-0 bg-white shadow-lg border rounded-md text-black w-40 z-50"
             >
-              <span
-                className={`px-2 py-1 rounded-t-md ${
-                  activeCategory === category.name ? "bg-gray-700" : ""
-                }`}
-              >
-                {category.name}
-              </span>
+              {authUser ? (
+                <>
+                  <button
+                    onClick={handleMyAccount}
+                    className="block w-full text-left px-4 py-2 hover:bg-gray-100"
+                  >
+                    My Account
+                  </button>
+                  <button
+                    onClick={handleLogout}
+                    className="block w-full text-left px-4 py-2 hover:bg-gray-100"
+                  >
+                    Logout
+                  </button>
+                </>
+              ) : null
+              }
             </div>
-          ))}
+          )}
         </div>
       </div>
     </nav>

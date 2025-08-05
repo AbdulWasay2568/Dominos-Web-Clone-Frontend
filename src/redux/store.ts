@@ -8,12 +8,17 @@ addonOptionsReducer,
 cartReducer,
 cartItemReducer,
 orderReducer,
-orderItemReducer
+orderItemReducer,
+addressReducer,
+userReducer,
+loadingReducer,
+favouritesReducer,
 } from "./slices"
 
 export const store = configureStore({
     reducer:{
         auth: authReducer,
+        user: userReducer,
         category: categoryReducer,
         product: productReducer,
         addons: addonsReducer,
@@ -21,7 +26,11 @@ export const store = configureStore({
         cart: cartReducer,
         cartItem: cartItemReducer,
         order: orderReducer,
-        orderItem: orderItemReducer
+        orderItem: orderItemReducer,
+        address: addressReducer,
+        favourites: favouritesReducer,
+        loading: loadingReducer,
+
         
     }
 })

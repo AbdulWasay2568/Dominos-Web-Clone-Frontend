@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../redux/hooks";
 import { login } from "../redux/slices/auth.slice";
-import Loader from "../components/Loader";
+import { setCurrentUser, getUserById } from "../redux/slices/user.slice";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -11,7 +11,7 @@ export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const { loading, error } = useAppSelector((state) => state.auth);
+  const { error } = useAppSelector((state) => state.auth);
 
   const handleLogin = async (e: React.FormEvent) => {
   e.preventDefault();
@@ -22,25 +22,19 @@ export default function Login() {
       password,
     };
 
-    const resultAction = await dispatch(login(loginData));
+    const user = await dispatch(login(loginData)).unwrap();
+    const fetchedUser = await dispatch(getUserById(Number(user.id))).unwrap();
+    dispatch(setCurrentUser(fetchedUser));
 
-    if (login.fulfilled.match(resultAction)) {
-      const user = resultAction.payload;
-      console.log("Login successful:", user); 
-
+    if(fetchedUser.role === 'CUSTOMER'){
       navigate("/");
-      setEmail("");
-      setPassword("");
-    } else {
-      console.error("Login failed:", resultAction.payload);
+    }else{
+      navigate("/vendor/dashboard");
     }
-
   } catch (error) {
-    console.error("Something went wrong:", error);
+    console.error("Login failed:", error);
   }
 };
-
-if (loading) return <Loader/>;
 
 
   return (

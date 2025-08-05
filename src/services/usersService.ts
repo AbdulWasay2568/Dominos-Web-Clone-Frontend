@@ -14,7 +14,7 @@ export const fetchUsers = async () => {
 export const fetchUserById = async (id: number) => {
   try {
     const res = await apiClient.get(`/users/${id}`);
-    return res.data;
+    return res.data.user;
   } catch (err) {
     console.error(`Failed to fetch user ${id}:`, err);
     throw err;
@@ -49,4 +49,15 @@ export const deleteUser = async (id: number) => {
     console.error(`Failed to delete user ${id}:`, err);
     throw err;
   }
+};
+
+export const updateUserImage = async (userId: number, imageFile: File) => {
+  const formData = new FormData();
+  formData.append('image', imageFile);
+
+  const response = await apiClient.patch(
+    `/users/${userId}/image`,
+    formData
+  );
+  return response.data;
 };

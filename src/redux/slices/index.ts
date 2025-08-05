@@ -1,4 +1,5 @@
 export { default as authReducer } from './auth.slice';
+export { default as userReducer } from './user.slice';
 export { default as categoryReducer } from './category.slice';
 export { default as productReducer } from './product.slice';
 export { default as addonsReducer } from './addons.slice';
@@ -7,3 +8,6 @@ export { default as cartReducer } from './cart.slice';
 export { default as cartItemReducer } from './cartItem.slice';
 export { default as orderReducer } from './order.slice';
 export { default as orderItemReducer } from './orderItem.slice';
+export { default as addressReducer } from './address.slice'
+export { default as favouritesReducer } from './favourites.slice'
+export { default as loadingReducer } from './loading.slice'

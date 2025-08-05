@@ -3,9 +3,9 @@ import {
   CreateFavouriteDto,
 } from '../interfaces/favourites.interface';
 
-export const fetchFavourites = async () => {
+export const fetchFavouritesBbyUserId = async (userId: number) => {
   try {
-    const res = await apiClient.get('/favourites');
+    const res = await apiClient.get(`/favourites/user/${userId}`);
     return res.data;
   } catch (err) {
     console.error('Failed to fetch favourites:', err);

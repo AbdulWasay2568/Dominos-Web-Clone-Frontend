@@ -1,15 +1,8 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import { registerUser, loginUser } from "../../services/authService";
-
-// 1. Define types
-interface User {
-  id: string;
-  name: string;
-  email: string;
-  role: string;
-  token?: string;
-}
-
+import { clearCurrentUser } from "./user.slice"
+import { User } from "../../interfaces/users.interface";
+import { Role } from "../../interfaces/enums.interface"
 interface AuthState {
   user: User | null;
   isAuthenticated: boolean;
@@ -21,7 +14,7 @@ interface RegisterInput {
   name: string;
   email: string;
   password: string;
-  role: string;
+  role: Role;
 }
 
 interface LoginInput {
@@ -42,9 +35,19 @@ export const login = createAsyncThunk<User, LoginInput>(
   'auth/login',
   async (credentials) => {
     const response = await loginUser(credentials);
-    return response; // assume response is of type User
+    return response;
   }
 );
+
+
+export const logout = createAsyncThunk(
+  'auth/logout',
+  async (_, { dispatch }) => {
+    dispatch(clearCurrentUser());
+    return; 
+  }
+);
+
 
 // 3. Initial state
 const initialState: AuthState = {
@@ -59,10 +62,7 @@ const authSlice = createSlice({
   name: 'auth',
   initialState,
   reducers: {
-    logout(state) {
-      state.user = null;
-      state.isAuthenticated = false;
-    }
+
   },
   extraReducers: (builder) => {
     builder
@@ -92,9 +92,22 @@ const authSlice = createSlice({
       .addCase(login.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message || "Login failed";
+      })
+
+      .addCase(logout.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(logout.fulfilled, (state) => {
+        state.loading = false;
+        state.user = null;
+        state.isAuthenticated = false;
+      })
+      .addCase(logout.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message || "Logout failed";
       });
-  }
+      }
 });
 
-export const { logout } = authSlice.actions;
 export default authSlice.reducer;
