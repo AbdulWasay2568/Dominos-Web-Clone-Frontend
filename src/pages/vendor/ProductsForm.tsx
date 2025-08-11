@@ -40,7 +40,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
   const [price, setPrice] = useState<number>(initialData?.price || 0);
   const [category, setCategory] = useState('');
   const [addons, setAddons] = useState<Addon[]>(initialData?.addons || []);
-  const [image, setImage] = useState<File | null>(null);
+  const [image, setImage] = useState<File>();
   const [preview, setPreview] = useState<string | null>(initialData?.imageUrl || null);
 
   const categories = useAppSelector((state) => state.category.categories);
@@ -60,7 +60,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] || null;
-    setImage(file);
+    setImage(file ?? undefined);
 
     if (file) {
       const reader = new FileReader();
@@ -94,8 +94,11 @@ const ProductForm: React.FC<ProductFormProps> = ({
     value: string | number
   ) => {
     const updated = [...addons];
-    updated[addonIndex].options[optionIndex][field] =
-      field === 'additionalPrice' ? Number(value) : value;
+    if (field === 'additionalPrice') {
+      updated[addonIndex].options[optionIndex].additionalPrice = Number(value);
+    } else if (field === 'optionName') {
+      updated[addonIndex].options[optionIndex].optionName = value as string;
+    }
     setAddons(updated);
   };
 
@@ -116,8 +119,8 @@ const ProductForm: React.FC<ProductFormProps> = ({
       addons: addons.map((addon) => ({
         name: addon.name,
         options: addon.options.map((option) => ({
-          name: option.optionName,
-          price: option.additionalPrice,
+          optionName: option.optionName,
+          additionalPrice: option.additionalPrice,
         })),
       })),
     };
@@ -141,7 +144,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
         })).unwrap();
       }
 
-      // navigate('/vendor/products');
+      navigate('/vendor/products');
     } catch (err) {
       console.error(editMode ? 'Failed to update product:' : 'Failed to create product:', err);
       alert(editMode ? 'Failed to update product' : 'Failed to create product');
