@@ -1,12 +1,13 @@
 import { apiClient } from './axios';
 import axios from 'axios';
 import { jwtDecode } from 'jwt-decode';
+import { Role } from '../interfaces/enums.interface';
 
 export const registerUser = async (userData: {
   name: string;
   email: string;
   password: string;
-  role: string;
+  role: Role;
 }) => {
   try {
     const response = await apiClient.post('/auth/register', userData);
@@ -28,7 +29,7 @@ export const loginUser = async (credentials: {
     const response = await apiClient.post('/auth/login', credentials);
     const token = response.data.token;
 
-    const decodedToken = jwtDecode<{ id: string; role: string }>(token);
+    const decodedToken = jwtDecode<{ id: number; role: Role }>(token);
     return {id: decodedToken.id, role: decodedToken.role};
 
   } catch (error: unknown) {
