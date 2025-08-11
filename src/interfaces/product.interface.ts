@@ -1,4 +1,5 @@
 import { Addon } from "./addons.interface";
+import { Category } from "./category.interface";
 
 export interface CreateProductDto {
   name: string;
@@ -24,6 +25,7 @@ export interface Product {
   createdAt: string;
   updatedAt: string;
   addons: Addon[];
+  category: Category;
 }
 
 export interface CreateProductWithAddonsDto {

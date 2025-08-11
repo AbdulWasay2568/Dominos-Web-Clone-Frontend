@@ -25,9 +25,9 @@ const ProductDetails: React.FC = () => {
   }, [dispatch, productId]);
 
   useEffect(() => {
-    if (product?.addons?.length > 0) {
+    if (product?.addons?.length && product.addons.length > 0) {
       const firstAddon = product.addons[0];
-      if (firstAddon?.options?.length > 0) {
+      if (firstAddon?.options?.length && firstAddon.options.length > 0) {
         setSelectedFirstOption(firstAddon.options[0]);
       }
     }

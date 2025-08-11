@@ -17,7 +17,10 @@ const ProfileScreen = () => {
     city: '',
   });
 
-  const handleAddressChange = (field, value) => {
+  const handleAddressChange = (
+    field: keyof typeof newAddress,
+    value: string
+  ) => {
     setNewAddress({ ...newAddress, [field]: value });
   };
 
@@ -27,7 +30,7 @@ const ProfileScreen = () => {
     setNewAddress({ house: '', street: '', society: '', city: '' });
   };
 
-  const deleteAddress = (id) => {
+  const deleteAddress = (id:number) => {
     setAddresses(addresses.filter((addr) => addr.id !== id));
   };
 
@@ -84,7 +87,7 @@ const ProfileScreen = () => {
         <h2 className="text-xl font-semibold mb-4">Address Book</h2>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-          {['house', 'street', 'society', 'city'].map((field) => (
+          {(['house', 'street', 'society', 'city'] as Array<keyof typeof newAddress>).map((field) => (
             <div key={field}>
               <label className="block text-gray-700 mb-1 capitalize">{field}</label>
               <input
