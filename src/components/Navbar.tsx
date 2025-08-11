@@ -4,7 +4,7 @@ import { useAppDispatch, useAppSelector } from "../redux/hooks";
 import { Link, useNavigate } from "react-router-dom";
 import { logout } from "../redux/slices/auth.slice";
 
-const Navbar: React.FC = () => {
+const NavBar: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const authUser = useAppSelector((state) => state.auth.user);
@@ -111,4 +111,4 @@ const Navbar: React.FC = () => {
   );
 };
 
-export default Navbar;
+export default NavBar;
