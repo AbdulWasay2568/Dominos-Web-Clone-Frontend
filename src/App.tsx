@@ -14,20 +14,19 @@ import ForgotPassword from "./pages/ForgotPassword";
 
 // Customer Pages
 import ProductDetails from "./pages/ProductDetails";
-import Cart from "./pages/Cart";
-import Checkout from "./pages/Checkout";
-import OrderConfirmation from "./pages/OrderConfirmation";
-import OrderTracking from "./pages/OrderTracking";
-import OrderHistory from "./pages/OrderHistory";
-import Favorites from "./pages/Favourites";
-import CustomerSupport from "./pages/CustomerSupport";
+import Cart from "./pages/customer/Cart";
+import Checkout from "./pages/customer/Checkout";
+import OrderConfirmation from "./pages/customer/OrderConfirmation";
+import OrderTracking from "./pages/customer/OrderTracking";
+import OrderHistory from "./pages/customer/OrderHistory";
+import Favorites from "./pages/customer/Favourites";
+import CustomerSupport from "./pages/customer/CustomerSupport";
 import ProfilePage from "./components/Profile";
 
 import Profile from "./components/MyDetails"
 
 // Vendor Pages
 import VendorDashboard from "./pages/vendor/VendorDashboard";
-import VendorProfile from "./pages/vendor/VendorProfile";
 import CategoryManagement from "./pages/vendor/CategoryManagement";
 import MenuManagement from "./pages/vendor/MenuManagement";
 import OrdersManagement from "./pages/vendor/OrdersManagement";
@@ -35,6 +34,7 @@ import Notifications from "./pages/vendor/Notifications";
 
 import ProductsPage from "./pages/vendor/Products";
 import ProductsForm from "./pages/vendor/ProductsForm"
+import ProductEditWrapper from "./pages/vendor/ProductEditWrapper";
 
 
 const App: React.FC = () => {
@@ -72,8 +72,8 @@ const App: React.FC = () => {
           <Route path="/vendor/notifications" element={<Notifications />} />
 
           <Route path="/vendor/products" element={<ProductsPage />} />
-          {/* <Route path="/vendor/products/:id/edit" element={<ProductsForm />} />
-          <Route path="/vendor/products/new" element={<ProductsForm />} /> */}
+          <Route path="/vendor/products/:id/edit" element={<ProductEditWrapper />} />
+          <Route path="/vendor/products/new" element={<ProductsForm />} />
 
 
         </Route>

@@ -1,7 +1,6 @@
 import React, { useEffect, useRef } from "react";
 import { FaCartPlus, FaHeart, FaRegHeart } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
-import BBQChicken from "../assets/Images/BBQChicken.jpg";
 import { useAppDispatch, useAppSelector } from "../redux/hooks";
 import { getAllProducts } from "../redux/slices/product.slice";
 import {
@@ -109,7 +108,7 @@ const Card: React.FC<CardProps> = ({ scrollToCategory }) => {
                   >
                     <div className="relative">
                       <img
-                        src={BBQChicken}
+                        src={prod.imageUrl}
                         alt={prod.name}
                         className="w-full h-52 object-cover"
                       />

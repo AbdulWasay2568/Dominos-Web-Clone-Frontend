@@ -50,3 +50,29 @@ export const deleteProduct = async (id: number) => {
     throw err;
   }
 };
+
+
+export const createProductWithAddons = async (data: CreateProductDto, imageFile: File) => {
+  try {
+    const formData = new FormData();
+    formData.append('image', imageFile);
+    formData.append('data', JSON.stringify(data));
+
+    const res = await apiClient.post('/products/addons/', formData);
+    return res.data;
+  } catch (err) {
+    console.error('Failed to create product with addons:', err);
+    throw err;
+  }
+};
+
+export const updateProductImage = async (productId: number, imageFile: File) => {
+  const formData = new FormData();
+  formData.append('image', imageFile);
+
+  const response = await apiClient.patch(
+    `/products/${productId}/image`,
+    formData
+  );
+  return response.data;
+};

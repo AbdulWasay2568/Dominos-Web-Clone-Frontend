@@ -2,8 +2,8 @@ import { useState } from 'react';
 import { Menu } from 'lucide-react'; // for hamburger icon
 import MyDetails from "../components/MyDetails";
 import MyAddresses from "../components/MyAddresses";
-import MyOrders from "../pages/OrderHistory";
-import MyFavorites from "../pages/Favourites";
+import MyOrders from "../pages/customer/OrderHistory";
+import MyFavorites from "../pages/customer/Favourites";
 
 const ProfilePage = () => {
   const [selected, setSelected] = useState<string>('My Details');

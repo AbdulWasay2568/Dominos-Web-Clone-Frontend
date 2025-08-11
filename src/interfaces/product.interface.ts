@@ -20,7 +20,23 @@ export interface Product {
   description: string;
   price: number;
   categoryId: number;
+  imageUrl: string;
   createdAt: string;
   updatedAt: string;
   addons: Addon[];
 }
+
+export interface CreateProductWithAddonsDto {
+  name: string;
+  description: string;
+  price: number;
+  categoryId: number;
+  addons?: {
+    name: string;
+    options: {
+      optionName: string;
+      additionalPrice: number;
+    }[];
+  }[];
+}
+

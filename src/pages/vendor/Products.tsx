@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
-import { getAllProducts } from "../../redux/slices/product.slice";
+import { deleteProductById, getAllProducts } from "../../redux/slices/product.slice";
 
 const ProductsPage: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -16,8 +16,7 @@ const ProductsPage: React.FC = () => {
   }, [dispatch]);
 
   const handleDelete = (id: number) => {
-    // TODO: implement delete logic
-    console.log("Delete product ID:", id);
+    dispatch(deleteProductById(id));
   };
 
   const uniqueCategories = ['All', ...Array.from(new Set(products.map(p => p.category?.name).filter(Boolean)))];

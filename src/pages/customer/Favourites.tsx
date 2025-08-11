@@ -1,16 +1,14 @@
 import React, { useEffect } from "react";
 import { FaCartPlus, FaHeart } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
-import { useAppDispatch, useAppSelector } from "../redux/hooks";
+import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import {
   addFavourite,
   removeFavourite,
   getFavouritesByUserId,
-} from "../redux/slices/favourites.slice";
+} from "../../redux/slices/favourites.slice";
 
-import { getAllProducts } from "../redux/slices/product.slice";
-
-import SauceBoss from "../assets/Images/SauceBoss.jpg";
+import { getAllProducts } from "../../redux/slices/product.slice";
 
 const Favorites: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -65,7 +63,7 @@ const Favorites: React.FC = () => {
             >
               <div className="relative">
                 <img
-                  src={SauceBoss}
+                  src={prod.imageUrl}
                   alt={prod.name}
                   className="w-full h-52 object-cover"
                 />

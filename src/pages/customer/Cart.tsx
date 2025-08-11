@@ -1,12 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaTrash, FaPlus, FaMinus } from "react-icons/fa";
-import { useAppDispatch, useAppSelector } from "../redux/hooks";
-import { getCartByUserId } from "../redux/slices/cart.slice";
-import { editCartItem, removeCartItem } from "../redux/slices/cartItem.slice"
-import { CartItem } from "../interfaces/cartItem.interface";
-import SauceBoss from "../assets/Images/SauceBoss.jpg";
-import { setGrandTotal } from "../redux/slices/order.slice";
+import { useAppDispatch, useAppSelector } from "../../redux/hooks";
+import { getCartByUserId } from "../../redux/slices/cart.slice";
+import { editCartItem, removeCartItem } from "../../redux/slices/cartItem.slice"
+import { CartItem } from "../../interfaces/cartItem.interface";
+import OrderSummary from "../../components/OrderSummary";
 
 const CartScreen: React.FC = () => {
   const navigate = useNavigate();
@@ -14,14 +13,9 @@ const CartScreen: React.FC = () => {
 
   const user = useAppSelector((state) => state.auth.user);
   const currentCart = useAppSelector((state) => state.cart.currentCart);
-  const [instructions, setInstructions] = useState("");
 
   useEffect(() => {
-    if (user?.id === null || user === null || user === undefined) {
-      navigate("/login");
-    } else {
-      dispatch(getCartByUserId(Number(user.id)));
-    }
+    dispatch(getCartByUserId(Number(user?.id)));
   }, [dispatch, user, navigate]);
 
 
@@ -39,10 +33,7 @@ const CartScreen: React.FC = () => {
   const discount = 0;
   const grandTotal = total + deliveryCharge + posFee - discount;
 
-  const handleCheckout = () => {
-    dispatch(setGrandTotal(grandTotal));
-    navigate("/checkout");
-  };
+
 
   return (
     <div className="max-w-7xl mx-auto p-6">
@@ -60,7 +51,7 @@ const CartScreen: React.FC = () => {
                 className="flex gap-4 items-start border rounded-lg p-4 shadow-sm hover:shadow-md transition"
               >
                 <img
-                  src={SauceBoss}
+                  src={item.product?.imageUrl}
                   alt={item.product?.name ?? "Product image"}
                   className="w-28 h-28 rounded object-cover"
                 />
@@ -130,52 +121,14 @@ const CartScreen: React.FC = () => {
             ))}
           </div>
 
-          {/* Checkout Section */}
-          <div className="w-full lg:w-1/3 bg-gray-50 p-5 rounded-lg shadow space-y-4 h-fit">
-            <h2 className="text-xl font-bold">Checkout</h2>
-
-            <div>
-              <label className="block font-medium mb-1">Delivery Instructions</label>
-              <textarea
-                rows={3}
-                value={instructions}
-                onChange={(e) => setInstructions(e.target.value)}
-                placeholder="Instructions for Delivery Expert..."
-                className="w-full p-2 border border-gray-300 rounded"
+        <OrderSummary
+                total={total}
+                deliveryCharges={deliveryCharge}
+                posFee={posFee}
+                discount={discount}
+                grandTotal={grandTotal}
               />
-            </div>
 
-            <div className="border-t pt-4 text-sm space-y-2">
-              <div className="flex justify-between">
-                <span>Total</span>
-                <span>Rs. {total}</span>
-              </div>
-              <div className="flex justify-between">
-                <span>Delivery Charges</span>
-                <span>Rs. {deliveryCharge}</span>
-              </div>
-              <div className="flex justify-between">
-                <span>POS Fee</span>
-                <span>Rs. {posFee}</span>
-              </div>
-              <div className="flex justify-between text-green-600">
-                <span>Your Discount</span>
-                <span>- Rs. {discount.toFixed(1)}</span>
-              </div>
-              <hr />
-              <div className="flex justify-between font-bold text-lg">
-                <span>Grand Total</span>
-                <span>Rs. {grandTotal}</span>
-              </div>
-            </div>
-
-            <button
-              className="w-full bg-green-600 text-white py-2 rounded hover:bg-green-700 transition"
-              onClick={handleCheckout}
-            >
-              Proceed to Checkout
-            </button>
-          </div>
         </div>
       )}
     </div>

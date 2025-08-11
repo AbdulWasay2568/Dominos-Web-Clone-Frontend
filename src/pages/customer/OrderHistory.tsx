@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import { useAppDispatch, useAppSelector } from "../redux/hooks";
-import { getOrdersByUserId } from "../redux/slices/order.slice";
-import { Order } from "../interfaces/order.interfaces";
+import { useAppDispatch, useAppSelector } from "../../redux/hooks";
+import { getOrdersByUserId } from "../../redux/slices/order.slice";
+import { Order } from "../../interfaces/order.interfaces";
 
 export default function OrderHistory() {
   const dispatch = useAppDispatch();

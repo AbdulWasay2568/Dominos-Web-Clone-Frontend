@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import SuaceBoss from "../assets/Images/SauceBoss.jpg";
 import { useAppDispatch, useAppSelector } from "../redux/hooks";
 import { getProductById } from "../redux/slices/product.slice";
 import { addProductWithAddonsToCart } from "../redux/slices/cart.slice"
@@ -84,7 +83,7 @@ const toggleExtraOption = (optionId: number) => {
   return (
     <div className="max-w-2xl mx-auto p-6 bg-white rounded shadow">
       <div className="mb-4">
-        <img src={SuaceBoss} alt={product.name} className="w-full h-auto rounded" />
+        <img src={product.imageUrl} alt={product.name} className="w-full h-auto rounded" />
       </div>
 
       <h1 className="text-2xl font-bold mb-2">{product.name}</h1>

@@ -1,16 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
-import { createProduct, updateProduct, getAllProducts } from "../../redux/slices/product.slice";
+import { createProductWithAddon, updateProductByIdWithImage } from "../../redux/slices/product.slice";
+import { getAllCategories } from "../../redux/slices/category.slice";
 
-interface Product {
-  id?: number;
-  name: string;
-  description: string;
-  price: number;
-  category: string;
-  image?: File | null;
-  addons: Addon[];
+interface AddonOption {
+  optionName: string;
+  additionalPrice: number;
 }
 
 interface Addon {
@@ -18,44 +14,49 @@ interface Addon {
   options: AddonOption[];
 }
 
-interface AddonOption {
-  optionName: string;
-  additionalPrice: number;
+interface ProductFormProps {
+  editMode?: boolean;
+  productId?: number;
+  initialData?: {
+    name: string;
+    description: string;
+    price: number;
+    categoryId: number;
+    addons: Addon[];
+    imageUrl?: string;
+  };
 }
 
-const ProductForm: React.FC = () => {
-  const { id } = useParams();
+const ProductForm: React.FC<ProductFormProps> = ({
+  editMode = false,
+  productId,
+  initialData,
+}) => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const { products } = useAppSelector((state) => state.product);
 
-  const [name, setName] = useState('');
-  const [desc, setDesc] = useState('');
-  const [price, setPrice] = useState<number>(0);
-  const [category, setCategory] = useState('Pizzas');
-  const [addons, setAddons] = useState<Addon[]>([]);
+  const [name, setName] = useState(initialData?.name || '');
+  const [desc, setDesc] = useState(initialData?.description || '');
+  const [price, setPrice] = useState<number>(initialData?.price || 0);
+  const [category, setCategory] = useState('');
+  const [addons, setAddons] = useState<Addon[]>(initialData?.addons || []);
   const [image, setImage] = useState<File | null>(null);
-  const [preview, setPreview] = useState<string | null>(null);
+  const [preview, setPreview] = useState<string | null>(initialData?.imageUrl || null);
 
-  // Fetch all products on mount
+  const categories = useAppSelector((state) => state.category.categories);
+
   useEffect(() => {
-    dispatch(getAllProducts());
+    dispatch(getAllCategories());
   }, [dispatch]);
 
-  // Set form values if editing
   useEffect(() => {
-    if (id) {
-      const product = products.find((p) => p.id === Number(id));
-      if (product) {
-        setName(product.name);
-        setDesc(product.description);
-        setPrice(product.price);
-        setCategory(product.category || 'Pizzas');
-        setAddons(product.addons || []);
-        setPreview(product.image); // Assuming image is a URL if editing
+    if (initialData && categories.length > 0) {
+      const cat = categories.find((c) => c.id === initialData.categoryId);
+      if (cat) {
+        setCategory(cat.name);
       }
     }
-  }, [id, products]);
+  }, [categories, initialData]);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] || null;
@@ -101,33 +102,59 @@ const ProductForm: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const productData: Product = {
-      id: id ? Number(id) : undefined,
+    const selectedCategory = categories.find((cat) => cat.name === category);
+    if (!selectedCategory) {
+      alert('Invalid category selected');
+      return;
+    }
+
+    const productData = {
       name,
       description: desc,
       price,
-      category,
-      image,
-      addons,
+      categoryId: selectedCategory.id,
+      addons: addons.map((addon) => ({
+        name: addon.name,
+        options: addon.options.map((option) => ({
+          name: option.optionName,
+          price: option.additionalPrice,
+        })),
+      })),
     };
 
-    if (id) {
-      await dispatch(updateProduct(productData));
-    } else {
-      await dispatch(createProduct(productData));
-    }
+    try {
+      if (editMode && productId) {
+        await dispatch(updateProductByIdWithImage({
+          id: productId,
+          data: productData,
+          image,
+        })).unwrap();
+      } else {
+        if (!image) {
+          alert('Please upload a product image');
+          return;
+        }
 
-    navigate("/vendor/products");
+        await dispatch(createProductWithAddon({
+          data: productData,
+          imageFile: image,
+        })).unwrap();
+      }
+
+      // navigate('/vendor/products');
+    } catch (err) {
+      console.error(editMode ? 'Failed to update product:' : 'Failed to create product:', err);
+      alert(editMode ? 'Failed to update product' : 'Failed to create product');
+    }
   };
 
   return (
     <div className="max-w-3xl mx-auto p-4 sm:p-6 bg-white shadow rounded-lg">
       <h2 className="text-2xl font-bold mb-6 text-gray-800">
-        {id ? 'Edit Product' : 'Add New Product'}
+        {editMode ? 'Edit Product' : 'Add New Product'}
       </h2>
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Name */}
         <div>
           <label className="block mb-1 font-semibold">Name</label>
           <input
@@ -138,7 +165,6 @@ const ProductForm: React.FC = () => {
           />
         </div>
 
-        {/* Description */}
         <div>
           <label className="block mb-1 font-semibold">Description</label>
           <textarea
@@ -150,7 +176,6 @@ const ProductForm: React.FC = () => {
           />
         </div>
 
-        {/* Price */}
         <div>
           <label className="block mb-1 font-semibold">Price</label>
           <input
@@ -162,7 +187,6 @@ const ProductForm: React.FC = () => {
           />
         </div>
 
-        {/* Category */}
         <div>
           <label className="block mb-1 font-semibold">Category</label>
           <select
@@ -170,13 +194,15 @@ const ProductForm: React.FC = () => {
             onChange={(e) => setCategory(e.target.value)}
             className="w-full border px-3 py-2 rounded focus:outline-blue-500"
           >
-            <option value="Pizzas">Pizzas</option>
-            <option value="Sides">Sides</option>
-            <option value="Drinks">Drinks</option>
+            {categories.map((cat) => (
+              <option key={cat.id} value={cat.name}>
+                {cat.name}
+              </option>
+            ))}
+            <option value="Other">Other</option>
           </select>
         </div>
 
-        {/* Image Upload */}
         <div>
           <label className="block mb-1 font-semibold">Product Image</label>
           <input
@@ -190,7 +216,6 @@ const ProductForm: React.FC = () => {
           )}
         </div>
 
-        {/* Addons */}
         <div>
           <label className="block mb-2 font-semibold">Addons</label>
           {addons.map((addon, i) => (
@@ -245,13 +270,12 @@ const ProductForm: React.FC = () => {
           </button>
         </div>
 
-        {/* Submit Button */}
         <div className="pt-4">
           <button
             type="submit"
             className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded"
           >
-            {id ? 'Update Product' : 'Create Product'}
+            {editMode ? 'Update Product' : 'Create Product'}
           </button>
         </div>
       </form>
