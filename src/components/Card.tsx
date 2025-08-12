@@ -113,7 +113,7 @@ const Card: React.FC<CardProps> = ({ scrollToCategory }) => {
                         className="w-full h-52 object-cover"
                       />
                     </div>
-                  </Link>
+                  
 
                   <div className="p-4 flex flex-col justify-between h-[180px]">
                     <div>
@@ -152,6 +152,7 @@ const Card: React.FC<CardProps> = ({ scrollToCategory }) => {
                       Add To Cart
                     </button>
                   </div>
+                  </Link>
                 </div>
               ))}
             </div>
